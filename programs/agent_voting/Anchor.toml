@@ -1,0 +1,6 @@
+[provider]
+cluster = "mainnet"
+wallet = "~/.config/solana/id.json"
+
+[programs.localnet]
+agent_voting = "YOUR_PROGRAM_ID"
