@@ -1,0 +1,18 @@
+name: Deploy SKALE
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: npm install -g @skalenetwork/skale-cli
+      - run: skale deploy --network mainnet --contract contracts/SKALE/AgentDAO.sol
+        env:
+          PRIVATE_KEY: ${{ secrets.SKALE_PRIVATE_KEY }}
