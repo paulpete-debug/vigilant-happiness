@@ -1,0 +1,48 @@
+name: Deploy
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # ---- Fix for Anchor (Solana) ----
+      - name: Install OpenSSL 1.1
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libssl1.1 || true
+          sudo ln -s /usr/lib/x86_64-linux-gnu/libssl.so /usr/lib/x86_64-linux-gnu/libssl.so.1.1 || true
+          sudo ln -s /usr/lib/x86_64-linux-gnu/libcrypto.so /usr/lib/x86_64-linux-gnu/libcrypto.so.1.1 || true
+
+      - name: Install Anchor CLI
+        run: npm install -g @project-serum/anchor-cli
+
+      # ---- Fix for SKALE ----
+      - name: Install SKALE CLI
+        run: |
+          curl -sL https://raw.githubusercontent.com/skalenetwork/skale-cli/master/install.sh | bash
+          echo "$HOME/.skale/bin" >> $GITHUB_PATH
+
+      # ---- Deploy Solana program ----
+      - name: Deploy Solana Program
+        run: |
+          cd programs/agent_voting
+          anchor deploy --provider.cluster mainnet
+
+      # ---- Deploy SKALE contract ----
+      - name: Deploy SKALE Contract
+        run: |
+          skale deploy --network mainnet --contract contracts/SKALE/AgentDAO.sol
