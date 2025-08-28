@@ -1,0 +1,5 @@
+[programs.localnet]
+agent_dao = "path/to/CreateAgentDAO.sol" # Adjust path if needed
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
